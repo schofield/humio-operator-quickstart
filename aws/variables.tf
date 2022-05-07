@@ -12,7 +12,7 @@ variable "humio_instance_count" {
 }
 variable "kafka_instance_type" {
   type    = string
-  default = "kafka.m5.large"
+  default = "kafka.t3.small"
 }
 variable "kafka_instance_count" {
   type    = number
@@ -20,7 +20,7 @@ variable "kafka_instance_count" {
 }
 variable "kafka_version" {
   type    = string
-  default = "2.4.1.1"
+  default = "2.8.1"
 }
 variable "kafka_volume_size" {
   type    = number
@@ -45,4 +45,13 @@ variable "namespace" {
 variable "service_account_name" {
   type    = string
   default = "humio-quickstart-humio"
+}
+
+variable "environment" {
+  type    = string
+  default = "Production"
+}
+variable "owner" {
+  type    = string
+  default = "humio"
 }

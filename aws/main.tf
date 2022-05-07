@@ -1,19 +1,38 @@
 terraform {
-  required_version = ">= 0.12.0"
+  required_version = ">= 1.1.0"
+  required_providers {
+    aws = {
+      version = ">= 2.28.1"
+    }
+    kubernetes = {
+      version = "~> 2.11"
+    }
+    random = {
+      version = "~> 3.1"
+    }
+    local = {
+      version = "~> 2"
+    }
+  }
 }
 
 provider "aws" {
-  version = ">= 2.28.1"
-  region  = var.region
+  # ... other configuration ...
+  default_tags {
+    tags = {
+      Name        = local.cluster_name
+      Environment = var.environment
+      Owner       = var.owner
+      App         = "aws2humio"
+      #repo          = "https://github.com/humio-contrib/humio-aws-cloutrail-tf"
+      DeployVersion = "0.1.0"
+      ManagedBy     = "Terraform"
+    }
+  }
 }
+data "aws_caller_identity" "current" {}
+data "aws_organizations_organization" "current" {}
 
-provider "random" {
-  version = "~> 2.1"
-}
-
-provider "local" {
-  version = "~> 1.2"
-}
 
 locals {
   cluster_name = "humio-quickstart-${random_string.suffix.result}"

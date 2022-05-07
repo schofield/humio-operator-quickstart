@@ -1,6 +1,6 @@
 module "iam_assumable_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "v2.9.0"
+  version                       = "4.24.0"
   create_role                   = true
   role_name                     = local.cluster_name
   provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
@@ -43,5 +43,5 @@ data "aws_iam_policy_document" "bucket_policy" {
 }
 
 output "oidc_role_arn" {
-  value = module.iam_assumable_role.this_iam_role_arn
+  value = module.iam_assumable_role.iam_role_arn
 }
