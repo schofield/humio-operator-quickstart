@@ -12,7 +12,7 @@ variable "humio_instance_count" {
 }
 variable "kafka_instance_type" {
   type    = string
-  default = "kafka.t3.small"
+  default = "kafka.m5.large"
 }
 variable "kafka_instance_count" {
   type    = number

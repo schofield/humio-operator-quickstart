@@ -10,7 +10,6 @@ provider "kubernetes" {
   host                   = data.aws_eks_cluster.cluster.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
   token                  = data.aws_eks_cluster_auth.cluster.token
-  #load_config_file       = false
 }
 
 resource "aws_security_group" "worker_group_mgmt_one" {
@@ -73,10 +72,6 @@ module "eks" {
   aws_auth_accounts = [
     data.aws_caller_identity.current.account_id
   ]
-
-  # tags = {
-  #   Name = local.cluster_name
-  # }
 
   eks_managed_node_group_defaults = {
     ami_type       = "AL2_x86_64"

@@ -23,8 +23,7 @@ provider "aws" {
       Name        = local.cluster_name
       Environment = var.environment
       Owner       = var.owner
-      App         = "aws2humio"
-      #repo          = "https://github.com/humio-contrib/humio-aws-cloutrail-tf"
+      App         = "humio"
       DeployVersion = "0.1.0"
       ManagedBy     = "Terraform"
     }
