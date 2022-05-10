@@ -17,21 +17,20 @@ terraform {
 }
 
 provider "aws" {
-  # ... other configuration ...
   default_tags {
     tags = {
-      Name        = local.cluster_name
-      Environment = var.environment
-      Owner       = var.owner
-      App         = "humio"
+      Name          = local.cluster_name
+      Environment   = var.environment
+      App           = "humio"
       DeployVersion = "0.1.0"
       ManagedBy     = "Terraform"
     }
   }
 }
-data "aws_caller_identity" "current" {}
-data "aws_organizations_organization" "current" {}
 
+data "aws_caller_identity" "current" {}
+
+data "aws_organizations_organization" "current" {}
 
 locals {
   cluster_name = "humio-quickstart-${random_string.suffix.result}"

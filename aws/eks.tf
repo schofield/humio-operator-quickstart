@@ -12,21 +12,6 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
-resource "aws_security_group" "worker_group_mgmt_one" {
-  name_prefix = "worker_group_mgmt_one"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-
-    cidr_blocks = [
-      "10.0.0.0/8",
-    ]
-  }
-}
-
 resource "aws_security_group" "eks_msk" {
   name   = "${local.cluster_name}-msk"
   vpc_id = module.vpc.vpc_id
@@ -35,7 +20,7 @@ resource "aws_security_group" "eks_msk" {
 
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
-  version         = "<19.0"
+  version         = "~> 18.20"
   cluster_name    = local.cluster_name
   cluster_version = "1.22"
   vpc_id          = module.vpc.vpc_id
@@ -78,7 +63,7 @@ module "eks" {
     instance_types = [var.humio_instance_type]
 
     attach_cluster_primary_security_group = true
-    vpc_security_group_ids                = [aws_security_group.worker_group_mgmt_one.id, aws_security_group.eks_msk.id]
+    vpc_security_group_ids                = [aws_security_group.eks_msk.id]
   }
 
   eks_managed_node_groups = {
@@ -101,4 +86,15 @@ module "eks" {
     }
   }
 
+  node_security_group_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = null
+  }
+}
+
+output "cluster_name" {
+  value = local.cluster_name
+}
+
+output "region" {
+  value = var.region
 }
