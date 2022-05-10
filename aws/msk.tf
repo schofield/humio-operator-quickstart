@@ -27,9 +27,6 @@ resource "aws_msk_cluster" "msk" {
   }
 
 
-  tags = {
-    Name = local.cluster_name
-  }
 }
 
 resource "aws_security_group_rule" "allow_kafka_tls" {
@@ -53,7 +50,7 @@ resource "aws_security_group_rule" "allow_zookeeper" {
 
 output "zookeeper_connect_string" {
   description = "Plain text connection host:port pairs"
-  value = aws_msk_cluster.msk.zookeeper_connect_string
+  value       = aws_msk_cluster.msk.zookeeper_connect_string
 }
 
 output "bootstrap_brokers_tls" {
