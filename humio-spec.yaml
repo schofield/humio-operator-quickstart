@@ -75,12 +75,12 @@ spec:
           name: developer-user
           key: password
     - name: HUMIO_JVM_ARGS
-      value: -Xss2m -Xms2g -Xmx6g -server -XX:MaxDirectMemorySize=6g -XX:+UseParallelGC -XX:+UnlockDiagnosticVMOptions -XX:CompileCommand=dontinline,com/humio/util/HotspotUtilsJ.dontInline -Xlog:gc+jni=debug:stdout -Dakka.log-config-on-start=on -Xlog:gc*:stdout:time,tags -Dzookeeper.client.secure=false
+      value: -Xss2m -Xms4g -Xmx110g -server -XX:MaxDirectMemorySize=16g -XX:+UseParallelGC -XX:+UnlockDiagnosticVMOptions -XX:CompileCommand=dontinline,com/humio/util/HotspotUtilsJ.dontInline -Xlog:gc+jni=debug:stdout -Dakka.log-config-on-start=on -Xlog:gc*:stdout:time,tags -Dzookeeper.client.secure=false
     - name: "ZOOKEEPER_URL"
       value: ${ZOOKEEPER_CONNECTION}
     - name: "KAFKA_SERVERS"
       value: ${KAFKA_BROKERS}
-# additions for scaling abilities
+# additional config options for cluster this size
     - name: AUTOSHARDING_MAX
       value: "64"
     - name: INGEST_QUEUE_INITIAL_PARTITIONS
