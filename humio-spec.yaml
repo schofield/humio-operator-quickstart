@@ -1,0 +1,89 @@
+apiVersion: core.humio.com/v1alpha1
+kind: HumioCluster
+metadata:
+  name: humio-quickstart
+  namespace: logging
+spec:
+  image: "humio/humio-core:1.42.0"
+  license:
+    secretKeyRef:
+      name: humio-quickstart-license
+      key: data
+  # match to node count in variables.tf
+  nodeCount: 51
+  targetReplicationFactor: 2
+  storagePartitionsCount: 204
+  digestPartitionsCount: 720
+  extraKafkaConfigs: "security.protocol=SSL"
+  tls:
+    enabled: true
+  autoRebalancePartitions: true
+  hostname: ${INGRESS_HOSTNAME}
+  esHostname: ${INGRESS_ES_HOSTNAME}
+  ingress:
+    enabled: true
+    controller: nginx
+    annotations:
+      use-http01-solver: "true"
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubernetes.io/ingress.class: nginx
+  # this should be sized for the node type in variables.tf
+  resources:
+    limits:
+      cpu: "30"
+      memory: 220Gi
+    requests:
+      cpu: "28"
+      memory: 220Gi
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - humio
+        topologyKey: kubernetes.io/hostname
+  dataVolumeSource:
+    hostPath:
+      path: "/mnt/disks/vol1"
+      type: "Directory"
+  humioServiceAccountAnnotations:
+    eks.amazonaws.com/role-arn: ${ROLE_ARN}
+  environmentVariables:
+    - name: S3_STORAGE_BUCKET
+      value: ${BUCKET_NAME}
+    - name: S3_STORAGE_REGION
+      value: ${REGION}
+    - name: LOCAL_STORAGE_PERCENTAGE
+      value: "80"
+    - name: LOCAL_STORAGE_MIN_AGE_DAYS
+      value: "7"
+    - name: S3_STORAGE_ENCRYPTION_KEY
+      valueFrom:
+        secretKeyRef:
+          name: bucket-storage
+          key: encryption-key
+    - name: USING_EPHEMERAL_DISKS
+      value: "true"
+    - name: S3_STORAGE_PREFERRED_COPY_SOURCE
+      value: "true"
+    - name: SINGLE_USER_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: developer-user
+          key: password
+    - name: HUMIO_JVM_ARGS
+      value: -Xss2m -Xms2g -Xmx6g -server -XX:MaxDirectMemorySize=6g -XX:+UseParallelGC -XX:+UnlockDiagnosticVMOptions -XX:CompileCommand=dontinline,com/humio/util/HotspotUtilsJ.dontInline -Xlog:gc+jni=debug:stdout -Dakka.log-config-on-start=on -Xlog:gc*:stdout:time,tags -Dzookeeper.client.secure=false
+    - name: "ZOOKEEPER_URL"
+      value: ${ZOOKEEPER_CONNECTION}
+    - name: "KAFKA_SERVERS"
+      value: ${KAFKA_BROKERS}
+# additions for scaling abilities
+    - name: AUTOSHARDING_MAX
+      value: "64"
+    - name: INGEST_QUEUE_INITIAL_PARTITIONS
+      value: "720"
+    - name: INGEST_QUEUE_REPLICATION_FACTOR
+      value: "3"
